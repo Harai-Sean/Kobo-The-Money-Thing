@@ -1,0 +1,39 @@
+@import 'tailwindcss';
+
+/*
+  Design tokens. Tailwind v4 turns every --color-* variable in @theme into utility
+  classes (bg-surface, text-ink, ...). PLACEHOLDER VALUES: the real palette comes from
+  the design pass. Components must use these names, never raw hex values, so
+  restyling later means editing this one block.
+*/
+@theme {
+  --color-surface: #f7f8f6;
+  --color-card: #ffffff;
+  --color-ink: #16211b;
+  --color-muted: #55635a;
+  --color-brand: #1f6f4a;
+  --color-danger: #b3261e;
+}
+
+body {
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+/* Keyboard users must always see where they are. */
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+/* Respect "reduce motion" from the OS. Every animation we add later inherits this. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
