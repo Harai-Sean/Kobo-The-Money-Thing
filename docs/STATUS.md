@@ -9,11 +9,13 @@ _Update this file at the end of every work session. Paste it into a new chat to 
 - CI workflow, Dependabot, PR template
 - Database migration `0001` (schema, RLS, signup trigger) and RLS check script
 - Auth: login, route guard (`RequireAuth`), sign out, change password, cache wipe on sign-out
+- Money utilities (`src/lib/money`): integer kobo, `nairaToKobo`, `formatNaira`, `sharePercentages`
+- Date utilities (`src/lib/dates`): ISO date strings, `todayIso`, `addDays`, weekdays, month helpers
 
 ## Next
 
 1. Apply the migration in Supabase, create two test users, run `supabase/tests/rls_check.sql`
-2. Money and date utilities with tests, then the quick-add parser
+2. Quick-add parser (`src/lib/parser`) using the money and date utilities
 3. Transactions data layer (TanStack Query + Zod) and the quick-add UI
 
 ## Decisions
