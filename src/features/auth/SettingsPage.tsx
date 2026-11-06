@@ -1,5 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import { Button } from '../../components/ui/Button'
+import { transactionsToCsv } from '../../lib/csv/csv'
+import { todayIso } from '../../lib/dates/dates'
+import { downloadTextFile } from '../../lib/download'
+import { useTransactionsApi } from '../transactions/hooks'
 import { TextField } from '../../components/ui/TextField'
 import { changePasswordSchema } from './schemas'
 import { useAuth, useSignedInUser } from './useAuth'
@@ -13,6 +17,22 @@ export function SettingsPage() {
   const [failed, setFailed] = useState(false)
   const [done, setDone] = useState(false)
   const [pending, setPending] = useState(false)
+  const api = useTransactionsApi()
+  const [exportState, setExportState] = useState<'idle' | 'working' | 'done' | 'failed'>('idle')
+
+  async function handleExport() {
+    setExportState('working')
+    try {
+      const [categories, transactions] = await Promise.all([
+        api.listCategories(),
+        api.listAllTransactions(),
+      ])
+      downloadTextFile(`kobo-export-${todayIso()}.csv`, transactionsToCsv(transactions, categories))
+      setExportState('done')
+    } catch {
+      setExportState('failed')
+    }
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -42,10 +62,33 @@ export function SettingsPage() {
 
   return (
     <main className="mx-auto max-w-sm p-6">
-      <h1 className="text-2xl font-semibold">Settings</h1>
+      <h1 className="font-display text-3xl font-bold">Settings</h1>
       <p className="mt-2 text-muted">Signed in as {user.email}</p>
 
-      <h2 className="mt-8 text-lg font-semibold">Change password</h2>
+      <h2 className="mt-8 font-display text-xl font-bold">Your data</h2>
+      <p className="mt-1 text-sm text-muted">
+        Download every entry as a spreadsheet file. It is made on your device and goes nowhere else.
+      </p>
+      <Button
+        variant="secondary"
+        className="mt-3"
+        disabled={exportState === 'working'}
+        onClick={() => void handleExport()}
+      >
+        {exportState === 'working' ? 'Preparing…' : 'Download my data (CSV)'}
+      </Button>
+      {exportState === 'done' && (
+        <p role="status" className="mt-2 text-sm font-medium text-brand">
+          Downloaded.
+        </p>
+      )}
+      {exportState === 'failed' && (
+        <p role="alert" className="mt-2 text-sm text-danger">
+          Could not prepare the file. Try again.
+        </p>
+      )}
+
+      <h2 className="mt-10 font-display text-xl font-bold">Change password</h2>
       <form onSubmit={handleSubmit} className="mt-4 space-y-4">
         <TextField
           label="New password"

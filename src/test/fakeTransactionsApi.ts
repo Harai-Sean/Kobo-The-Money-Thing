@@ -25,6 +25,11 @@ export function createFakeTransactionsApi(seed: Transaction[] = []) {
         .filter((t) => !hidden.has(t.id) && t.occurredOn >= from && t.occurredOn <= to)
         .sort((a, b) => b.occurredOn.localeCompare(a.occurredOn)),
     ),
+    listAllTransactions: vi.fn(async () =>
+      [...store.values()]
+        .filter((t) => !hidden.has(t.id))
+        .sort((a, b) => b.occurredOn.localeCompare(a.occurredOn)),
+    ),
     addTransaction: vi.fn(async (t: Transaction) => void store.set(t.id, t)),
     deleteTransaction: vi.fn(async (id: string) => void hidden.add(id)),
     restoreTransaction: vi.fn(async (id: string) => void hidden.delete(id)),
