@@ -5,9 +5,12 @@ import type { Category, Transaction } from './types'
 export interface CategoryShare {
   categoryId: string | null
   name: string
+  color: string
   total: number
   percent: number
 }
+
+const UNCATEGORISED_COLOR = '#8a948e'
 export interface MonthTotals {
   income: number
   expense: number
@@ -32,11 +35,15 @@ export function summarize(
     }
   }
   const rows = [...perCategory.entries()]
-    .map(([categoryId, total]) => ({
-      categoryId,
-      total,
-      name: categories.find((c) => c.id === categoryId)?.name ?? 'Uncategorised',
-    }))
+    .map(([categoryId, total]) => {
+      const category = categories.find((c) => c.id === categoryId)
+      return {
+        categoryId,
+        total,
+        name: category?.name ?? 'Uncategorised',
+        color: category?.color ?? UNCATEGORISED_COLOR,
+      }
+    })
     .sort((a, b) => b.total - a.total)
   const percents = sharePercentages(rows.map((r) => r.total))
   return {

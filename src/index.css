@@ -1,18 +1,57 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/bricolage-grotesque';
+@import '@fontsource-variable/instrument-sans';
 
 /*
-  Design tokens. Tailwind v4 turns every --color-* variable in @theme into utility
-  classes (bg-surface, text-ink, ...). PLACEHOLDER VALUES: the real palette comes from
-  the design pass. Components must use these names, never raw hex values, so
-  restyling later means editing this one block.
+  Design tokens. Tailwind v4 turns each --color-* / --font-* / --animate-* variable in @theme
+  into utility classes (bg-deep, text-lime, font-display, animate-rise, ...). Components use
+  these names, never raw hex values, so restyling means editing this one block.
+
+  Palette: "deep" is a banknote-green used for the header and the month panel, "lime" is the
+  one bright accent (always on deep, never as text on white: not enough contrast), "brand" is
+  the readable green for buttons and links.
 */
 @theme {
-  --color-surface: #f7f8f6;
+  --font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  --font-sans: 'Instrument Sans Variable', system-ui, sans-serif;
+
+  --color-surface: #f6f7f4;
   --color-card: #ffffff;
-  --color-ink: #16211b;
-  --color-muted: #55635a;
-  --color-brand: #1f6f4a;
+  --color-ink: #0e1a14;
+  --color-muted: #52605a;
+  --color-brand: #0b5d3b;
+  --color-deep: #0a2f21;
+  --color-lime: #c6f25a;
   --color-danger: #b3261e;
+
+  /* Motion: each one is a short entrance. The reduced-motion rule below switches them all off. */
+  --animate-rise: rise 0.4s ease-out both;
+  --animate-pop: pop 0.25s ease-out both;
+  --animate-grow: grow 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-sweep: sweep 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: scale(0.85);
+    }
+  }
+  @keyframes grow {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  @keyframes sweep {
+    from {
+      stroke-dasharray: 0 100;
+    } /* donut slices draw themselves in */
+  }
 }
 
 body {
@@ -22,17 +61,22 @@ body {
 
 /* Keyboard users must always see where they are. */
 :focus-visible {
-  outline: 2px solid var(--color-brand);
+  outline: 3px solid var(--color-brand);
   outline-offset: 2px;
 }
+/* On dark panels the green ring would vanish, so switch to lime there. */
+.on-dark :focus-visible {
+  outline-color: var(--color-lime);
+}
 
-/* Respect "reduce motion" from the OS. Every animation we add later inherits this. */
+/* Respect "reduce motion" from the OS. Every animation above inherits this. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    animation-delay: 0s !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }

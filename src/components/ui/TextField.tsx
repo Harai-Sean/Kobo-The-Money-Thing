@@ -16,7 +16,7 @@ export function TextField({ label, error, id, ...inputProps }: Props) {
         id={inputId}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
-        className="mt-1 block w-full rounded-md border border-ink/30 bg-card px-3 py-2"
+        className="mt-1 block w-full rounded-sm border-2 border-ink/40 bg-card px-3 py-2"
         {...inputProps}
       />
       {error && (
