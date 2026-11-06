@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { App } from './app/App'
 import { Providers } from './app/providers'
 import { parseEnv } from './lib/env'
+import { createSupabaseTransactionsApi } from './features/transactions/api'
 import { createSupabaseClient } from './lib/supabase/client'
 import './index.css'
 
@@ -13,7 +14,7 @@ try {
   const supabase = createSupabaseClient(parseEnv(import.meta.env))
   root.render(
     <StrictMode>
-      <Providers auth={supabase.auth}>
+      <Providers auth={supabase.auth} transactionsApi={createSupabaseTransactionsApi(supabase)}>
         <App />
       </Providers>
     </StrictMode>,

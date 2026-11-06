@@ -1,11 +1,38 @@
-import { useSignedInUser } from '../features/auth/useAuth'
+import { useState } from 'react'
+import { Button } from '../components/ui/Button'
+import { addMonths, formatMonth, monthOf, todayIso } from '../lib/dates/dates'
+import { MonthSummary } from '../features/transactions/MonthSummary'
+import { QuickAdd } from '../features/transactions/QuickAdd'
+import { TransactionList } from '../features/transactions/TransactionList'
 
 export function HomePage() {
-  const user = useSignedInUser()
+  const currentMonth = monthOf(todayIso())
+  const [month, setMonth] = useState(currentMonth)
+
   return (
-    <main className="mx-auto max-w-xl p-6">
-      <h1 className="text-3xl font-semibold">Kobo</h1>
-      <p className="mt-2 text-muted">Signed in as {user.email}. Quick add is coming next.</p>
+    <main className="mx-auto max-w-2xl space-y-6 p-4">
+      <h1 className="sr-only">Kobo</h1>
+      <QuickAdd />
+      <div className="flex items-center justify-between">
+        <Button
+          variant="secondary"
+          aria-label="Previous month"
+          onClick={() => setMonth(addMonths(month, -1))}
+        >
+          ←
+        </Button>
+        <h2 className="text-lg font-semibold">{formatMonth(month)}</h2>
+        <Button
+          variant="secondary"
+          aria-label="Next month"
+          disabled={month >= currentMonth}
+          onClick={() => setMonth(addMonths(month, 1))}
+        >
+          →
+        </Button>
+      </div>
+      <MonthSummary month={month} />
+      <TransactionList month={month} />
     </main>
   )
 }
