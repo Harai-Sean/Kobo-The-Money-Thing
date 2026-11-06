@@ -53,13 +53,13 @@ export function TransactionList({ month }: { month: MonthKey }) {
   const nameOf = (id: string | null) => categories.find((c) => c.id === id)?.name ?? 'Uncategorised'
 
   return (
-    <section aria-label="Transactions" className="space-y-5">
+    <section aria-label="Transactions" className="space-y-6">
       {undoable && (
-        <p role="status" className="flex items-center gap-3 rounded-md bg-ink/5 p-3 text-sm">
+        <p role="status" className="flex items-center gap-3 rounded-sm bg-ink/5 p-3 text-sm">
           Entry deleted.
           <button
             type="button"
-            className="font-medium underline"
+            className="font-semibold underline"
             onClick={() => {
               restore.mutate(undoable)
               setUndoable(null)
@@ -71,36 +71,43 @@ export function TransactionList({ month }: { month: MonthKey }) {
       )}
       {groupByDay(query.data).map((group) => (
         <div key={group.date}>
-          <h3 className="flex justify-between border-b border-ink/10 pb-1 text-sm font-semibold">
+          <h3 className="flex items-baseline justify-between border-b-2 border-ink pb-1 font-display text-lg font-bold">
             <span>{formatDayHeading(group.date, today)}</span>
             {group.spent > 0 && (
-              <span className="tabular-nums text-muted">Spent {formatNaira(group.spent)}</span>
+              <span className="font-sans text-sm font-medium tabular-nums text-muted">
+                Spent {formatNaira(group.spent)}
+              </span>
             )}
           </h3>
           <ul>
-            {group.items.map((t) => (
-              <li key={t.id} className="flex items-center justify-between gap-3 py-2">
-                <div className="min-w-0">
-                  <p className="truncate">{t.note || nameOf(t.categoryId)}</p>
-                  <p className="text-sm text-muted">{nameOf(t.categoryId)}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="tabular-nums font-medium">
-                    {t.kind === 'income' ? '+' : ''}
-                    {formatNaira(t.amountMinor)}
-                  </span>
-                  <button
-                    type="button"
-                    aria-label={`Delete ${t.note || nameOf(t.categoryId)} ${formatNaira(t.amountMinor)}`}
-                    className="text-sm underline"
-                    onClick={() => {
-                      remove.mutate(t)
-                      setUndoable(t)
-                    }}
-                  >
-                    Delete
-                  </button>
-                </div>
+            {group.items.map((t, index) => (
+              <li
+                key={t.id}
+                className="flex animate-rise items-baseline gap-2 py-2"
+                style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
+              >
+                <span className="truncate font-medium">{t.note || nameOf(t.categoryId)}</span>
+                <span className="shrink-0 text-sm text-muted">{nameOf(t.categoryId)}</span>
+                {/* The dotted leader, like a receipt: it leads the eye from the description to the amount. */}
+                <span
+                  aria-hidden="true"
+                  className="min-w-4 flex-1 translate-y-[-4px] border-b-2 border-dotted border-ink/30"
+                />
+                <span className="shrink-0 font-semibold tabular-nums">
+                  {t.kind === 'income' ? '+' : ''}
+                  {formatNaira(t.amountMinor)}
+                </span>
+                <button
+                  type="button"
+                  aria-label={`Delete ${t.note || nameOf(t.categoryId)} ${formatNaira(t.amountMinor)}`}
+                  className="shrink-0 text-sm text-muted underline"
+                  onClick={() => {
+                    remove.mutate(t)
+                    setUndoable(t)
+                  }}
+                >
+                  Delete
+                </button>
               </li>
             ))}
           </ul>

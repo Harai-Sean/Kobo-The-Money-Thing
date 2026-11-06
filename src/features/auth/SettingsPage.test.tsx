@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { createFakeAuth, signedInSession, TEST_EMAIL } from '../../test/fakeAuth'
 import { renderApp } from '../../test/render'
 
@@ -55,5 +55,17 @@ describe('SettingsPage', () => {
     await user.click(screen.getByRole('button', { name: 'Update password' }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent('could not change your password')
+  })
+
+  it('downloads all entries as a CSV file', async () => {
+    const createUrl = vi.fn((_blob: Blob) => 'blob:fake')
+    Object.assign(URL, { createObjectURL: createUrl, revokeObjectURL: vi.fn() })
+    const { user, api } = await openSettings()
+    await user.click(screen.getByRole('button', { name: 'Download my data (CSV)' }))
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Downloaded.')
+    expect(api.listAllTransactions).toHaveBeenCalled()
+    const blob = createUrl.mock.calls[0]?.[0]
+    expect(await blob?.text()).toContain('date,type,category,note,amount_ngn')
   })
 })

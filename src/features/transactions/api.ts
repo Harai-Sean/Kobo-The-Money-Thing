@@ -15,6 +15,8 @@ export interface TransactionsApi {
   listCategories(): Promise<Category[]>
   listRules(): Promise<Rule[]>
   listTransactions(range: { from: IsoDate; to: IsoDate }): Promise<Transaction[]>
+  /** Every entry the person has, for export. Pages through the results. */
+  listAllTransactions(): Promise<Transaction[]>
   addTransaction(transaction: Transaction): Promise<void>
   deleteTransaction(id: string): Promise<void>
   restoreTransaction(id: string): Promise<void>
@@ -24,6 +26,17 @@ export interface TransactionsApi {
 function check(error: { message: string } | null): void {
   if (error) throw new Error(error.message)
 }
+
+const toTransaction = (r: z.infer<typeof transactionRow>): Transaction => ({
+  id: r.id,
+  amountMinor: r.amount_minor,
+  kind: r.kind,
+  categoryId: r.category_id,
+  note: r.note,
+  occurredOn: r.occurred_on,
+})
+
+const PAGE_SIZE = 1000 // the most rows Supabase returns per request by default
 
 // Note: we never send user_id. The database fills it in from the logged-in session, and Row
 // Level Security rejects anything else.
@@ -69,6 +82,24 @@ export function createSupabaseTransactionsApi(client: SupabaseClient): Transacti
           note: r.note,
           occurredOn: r.occurred_on,
         }))
+    },
+
+    async listAllTransactions() {
+      const all: Transaction[] = []
+      for (let from = 0; ; from += PAGE_SIZE) {
+        const { data, error } = await client
+          .from('transactions')
+          .select('id, amount_minor, kind, category_id, note, occurred_on')
+          .is('deleted_at', null)
+          .order('occurred_on', { ascending: false })
+          .order('created_at', { ascending: false })
+          .order('id') // a fixed tie-breaker, so pages never overlap or skip rows
+          .range(from, from + PAGE_SIZE - 1)
+        check(error)
+        const page = z.array(transactionRow).parse(data).map(toTransaction)
+        all.push(...page)
+        if (page.length < PAGE_SIZE) return all
+      }
     },
 
     async addTransaction(t) {

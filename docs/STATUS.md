@@ -4,6 +4,11 @@ _Update this file at the end of every work session. Paste it into a new chat to 
 
 ## Done
 
+- Visual identity: deep-green and lime palette, Bricolage Grotesque and Instrument Sans (self-hosted),
+  ledger-style list, donut chart, motion that respects reduced-motion
+- CSV export from Settings (formula-safe), paging API for large data
+- Keep-alive workflow and `ping()` migration (needs repo secrets; see README)
+
 - Project scaffold: Vite, React, TypeScript strict, Tailwind v4, Router, TanStack Query, Zod
 - Environment validation (`src/lib/env.ts`) with tests
 - CI workflow, Dependabot, PR template
@@ -17,9 +22,9 @@ _Update this file at the end of every work session. Paste it into a new chat to 
 
 ## Next
 
-1. Design pass (Claude Design), then apply tokens, fonts and motion
-2. Edit entries, search and filter, CSV/JSON export
-3. Keep-alive workflow, README polish, tag v0.1.0
+1. Edit entries, search and filter
+2. Dark theme, PWA install, offline (see ADR-001)
+3. Wire parser `history`; budgets
 
 ## Decisions
 
