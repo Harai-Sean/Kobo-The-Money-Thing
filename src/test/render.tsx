@@ -5,10 +5,16 @@ import { MemoryRouter } from 'react-router'
 import { App } from '../app/App'
 import { AuthProvider } from '../features/auth/AuthProvider'
 import { ClearCacheOnSignOut } from '../features/auth/ClearCacheOnSignOut'
+import { TransactionsApiContext } from '../features/transactions/api-context'
 import { createFakeAuth, type FakeAuth } from './fakeAuth'
+import { createFakeTransactionsApi, type FakeTransactionsApi } from './fakeTransactionsApi'
 
-/** Renders the whole app at a URL, wired to a fake auth service. Returns handles for the test. */
-export function renderApp(path: string, auth: FakeAuth = createFakeAuth()) {
+/** Renders the whole app at a URL, wired to fake auth and a fake database. */
+export function renderApp(
+  path: string,
+  auth: FakeAuth = createFakeAuth(),
+  api: FakeTransactionsApi = createFakeTransactionsApi(),
+) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   const user = userEvent.setup()
   render(
@@ -16,10 +22,12 @@ export function renderApp(path: string, auth: FakeAuth = createFakeAuth()) {
       <MemoryRouter initialEntries={[path]}>
         <AuthProvider auth={auth}>
           <ClearCacheOnSignOut />
-          <App />
+          <TransactionsApiContext.Provider value={api}>
+            <App />
+          </TransactionsApiContext.Provider>
         </AuthProvider>
       </MemoryRouter>
     </QueryClientProvider>,
   )
-  return { auth, user, queryClient }
+  return { auth, api, user, queryClient }
 }

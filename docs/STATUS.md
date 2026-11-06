@@ -11,12 +11,15 @@ _Update this file at the end of every work session. Paste it into a new chat to 
 - Auth: login, route guard (`RequireAuth`), sign out, change password, cache wipe on sign-out
 - Money utilities (`src/lib/money`): integer kobo, `nairaToKobo`, `formatNaira`, `sharePercentages`
 - Date utilities (`src/lib/dates`): ISO date strings, `todayIso`, `addDays`, weekdays, month helpers
+- Quick-add parser (`src/lib/parser`): amounts (k/m, commas, ₦), dates, income, categories, warnings
+- Transactions: data layer (TanStack Query, optimistic add/delete/undo), QuickAdd with live preview
+  and category correction that saves rules, grouped list, month switcher, month summary
 
 ## Next
 
-1. Apply the migration in Supabase, create two test users, run `supabase/tests/rls_check.sql`
-2. Quick-add parser (`src/lib/parser`) using the money and date utilities
-3. Transactions data layer (TanStack Query + Zod) and the quick-add UI
+1. Design pass (Claude Design), then apply tokens, fonts and motion
+2. Edit entries, search and filter, CSV/JSON export
+3. Keep-alive workflow, README polish, tag v0.1.0
 
 ## Decisions
 
@@ -24,3 +27,5 @@ _Update this file at the end of every work session. Paste it into a new chat to 
 - Naira only, light theme first, invite-only accounts, no "reset month" (months are views)
 - Auth code depends on a small `AuthApi` interface, not on Supabase directly, so tests use a fake
 - Known: production bundle is over 500 kB; revisit with code-splitting when charts arrive
+- Parser `history` input exists but is not wired yet; saved rules cover learning for now
+- The Supabase data layer (`api.ts`) is only verified against a fake; first live run is the real test
