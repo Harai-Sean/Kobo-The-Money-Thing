@@ -18,7 +18,14 @@ function isPrivilegedKey(key: string): boolean {
 }
 
 const envSchema = z.object({
-  VITE_SUPABASE_URL: z.url(),
+  // Must be the bare project address, e.g. https://abc.supabase.co. The dashboard also shows a
+  // "Data API" address ending in /rest/v1, which breaks sign-in because Supabase adds its own paths.
+  VITE_SUPABASE_URL: z
+    .url()
+    .refine(
+      (value) => new URL(value).pathname === '/',
+      'Remove everything after .supabase.co (no /rest/v1).',
+    ),
   VITE_SUPABASE_PUBLISHABLE_KEY: z
     .string()
     .min(20)

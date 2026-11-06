@@ -26,6 +26,13 @@ describe('parseEnv', () => {
     expect(() => parseEnv({ ...good, VITE_SUPABASE_URL: 'not a url' })).toThrow()
   })
 
+  it('rejects a URL with a path such as the Data API address', () => {
+    expect(() =>
+      parseEnv({ ...good, VITE_SUPABASE_URL: 'https://abc.supabase.co/rest/v1/' }),
+    ).toThrow(/rest\/v1/)
+    expect(() => parseEnv({ ...good, VITE_SUPABASE_URL: 'https://abc.supabase.co/' })).not.toThrow()
+  })
+
   it('rejects a new-style secret key', () => {
     const bad = { ...good, VITE_SUPABASE_PUBLISHABLE_KEY: 'sb_secret_abcdefghijklmnopqrstuvwxyz' }
     expect(() => parseEnv(bad)).toThrow(/admin key/)
