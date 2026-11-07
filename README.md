@@ -4,12 +4,11 @@ A fast, private expense tracker. Type an expense the way you would say it (`bolt
 and see where your money went at the end of the month. Built for a small group of invited users,
 in naira.
 
-**Live app:** add your Vercel link here · **Status:** v0.1
+**Live app:** kobo-the-money-thing-fmj4-oztqor6ti-harai-seans-projects.vercel.app · **Status:** v0.1
 
-<!-- Add two screenshots to docs/screenshots/ and uncomment:
-![Home](docs/screenshots/home.png)
-![Month summary](docs/screenshots/summary.png)
--->
+[Home](docs\screenshots\RMSC1.png)
+[Analytics](docs\screenshots\RMSC2.png)
+[Entries](docs\screenshots\RMSC3.png)
 
 ## What it does
 
