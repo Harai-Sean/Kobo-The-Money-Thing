@@ -40,4 +40,22 @@ describe('LoginPage', () => {
     renderApp('/login', createFakeAuth(signedInSession))
     expect(await screen.findByRole('heading', { name: 'Kobo' })).toBeInTheDocument()
   })
+
+  it('lets you show and hide the password while typing', async () => {
+    const { user } = renderApp('/login')
+    const field = await screen.findByLabelText('Password')
+    await user.type(field, 'secret-value')
+    expect(field).toHaveAttribute('type', 'password')
+
+    await user.click(screen.getByRole('button', { name: 'Show password' }))
+    expect(field).toHaveAttribute('type', 'text')
+    expect(field).toHaveValue('secret-value') // nothing typed is lost by toggling
+    expect(screen.getByRole('button', { name: 'Hide password' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Hide password' }))
+    expect(field).toHaveAttribute('type', 'password')
+  })
 })

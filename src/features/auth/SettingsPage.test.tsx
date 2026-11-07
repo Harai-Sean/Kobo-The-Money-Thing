@@ -68,4 +68,11 @@ describe('SettingsPage', () => {
     const blob = createUrl.mock.calls[0]?.[0]
     expect(await blob?.text()).toContain('date,type,category,note,amount_ngn')
   })
+
+  it('has a separate show/hide button for each password field', async () => {
+    const { user } = await openSettings()
+    await user.click(screen.getByRole('button', { name: 'Show new password' }))
+    expect(screen.getByLabelText('New password')).toHaveAttribute('type', 'text')
+    expect(screen.getByLabelText('Confirm new password')).toHaveAttribute('type', 'password')
+  })
 })

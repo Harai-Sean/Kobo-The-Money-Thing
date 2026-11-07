@@ -61,11 +61,11 @@ export function SettingsPage() {
   }
 
   return (
-    <main className="mx-auto max-w-sm p-6">
-      <h1 className="font-display text-3xl font-bold">Settings</h1>
+    <main className="mx-auto max-w-sm px-5 pb-16 pt-2">
+      <h1 className="font-display text-3xl font-extrabold tracking-tight">Settings</h1>
       <p className="mt-2 text-muted">Signed in as {user.email}</p>
 
-      <h2 className="mt-8 font-display text-xl font-bold">Your data</h2>
+      <h2 className="mt-8 font-display text-xl font-extrabold">Your data</h2>
       <p className="mt-1 text-sm text-muted">
         Download every entry as a spreadsheet file. It is made on your device and goes nowhere else.
       </p>
@@ -88,7 +88,7 @@ export function SettingsPage() {
         </p>
       )}
 
-      <h2 className="mt-10 font-display text-xl font-bold">Change password</h2>
+      <h2 className="mt-10 font-display text-xl font-extrabold">Change password</h2>
       <form onSubmit={handleSubmit} className="mt-4 space-y-4">
         <TextField
           label="New password"
