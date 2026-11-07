@@ -4,8 +4,9 @@ _Update this file at the end of every work session. Paste it into a new chat to 
 
 ## Done
 
-- Visual identity: deep-green and lime palette, Bricolage Grotesque and Instrument Sans (self-hosted),
-  ledger-style list, donut chart, motion that respects reduced-motion
+- Visual identity v2: cobalt, sun, violet and leaf on a light page; pill shapes, drifting geometric
+  shapes, ledger-style list, donut with stable category colours, show/hide password, motion that
+  respects reduced-motion. Contrast for every text pair checked (lowest 4.88:1)
 - CSV export from Settings (formula-safe), paging API for large data
 - Keep-alive workflow and `ping()` migration (needs repo secrets; see README)
 

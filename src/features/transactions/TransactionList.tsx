@@ -8,6 +8,7 @@ import {
   useMonthTransactions,
   useRestoreTransaction,
 } from './hooks'
+import { categoryColor } from './colors'
 import { groupByDay } from './summary'
 import type { Transaction } from './types'
 
@@ -51,15 +52,20 @@ export function TransactionList({ month }: { month: MonthKey }) {
 
   const today = todayIso()
   const nameOf = (id: string | null) => categories.find((c) => c.id === id)?.name ?? 'Uncategorised'
+  // An entry typed without any words still needs a readable title.
+  const titleOf = (t: Transaction) => t.note || (t.kind === 'income' ? 'Income' : 'Expense')
 
   return (
     <section aria-label="Transactions" className="space-y-6">
       {undoable && (
-        <p role="status" className="flex items-center gap-3 rounded-sm bg-ink/5 p-3 text-sm">
+        <p
+          role="status"
+          className="flex items-center gap-3 rounded-full bg-tint-violet px-5 py-3 text-sm font-semibold"
+        >
           Entry deleted.
           <button
             type="button"
-            className="font-semibold underline"
+            className="underline"
             onClick={() => {
               restore.mutate(undoable)
               setUndoable(null)
@@ -71,7 +77,7 @@ export function TransactionList({ month }: { month: MonthKey }) {
       )}
       {groupByDay(query.data).map((group) => (
         <div key={group.date}>
-          <h3 className="flex items-baseline justify-between border-b-2 border-ink pb-1 font-display text-lg font-bold">
+          <h3 className="flex items-baseline justify-between border-b-2 border-ink pb-1 font-display text-xl font-extrabold tracking-tight">
             <span>{formatDayHeading(group.date, today)}</span>
             {group.spent > 0 && (
               <span className="font-sans text-sm font-medium tabular-nums text-muted">
@@ -83,30 +89,39 @@ export function TransactionList({ month }: { month: MonthKey }) {
             {group.items.map((t, index) => (
               <li
                 key={t.id}
-                className="flex animate-rise items-baseline gap-2 py-2"
+                className="flex animate-rise items-center gap-3 py-1.5"
                 style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
               >
-                <span className="truncate font-medium">{t.note || nameOf(t.categoryId)}</span>
-                <span className="shrink-0 text-sm text-muted">{nameOf(t.categoryId)}</span>
+                <span
+                  aria-hidden="true"
+                  className="size-3 shrink-0 rounded-full"
+                  style={{ background: categoryColor(categories, t.categoryId) }}
+                />
+                <span className="flex min-w-0 flex-col">
+                  <span className="truncate font-semibold">{titleOf(t)}</span>
+                  <span className="text-sm text-muted">{nameOf(t.categoryId)}</span>
+                </span>
                 {/* The dotted leader, like a receipt: it leads the eye from the description to the amount. */}
                 <span
                   aria-hidden="true"
-                  className="min-w-4 flex-1 translate-y-[-4px] border-b-2 border-dotted border-ink/30"
+                  className="min-w-3 flex-1 border-b-2 border-dotted border-line"
                 />
-                <span className="shrink-0 font-semibold tabular-nums">
+                <span
+                  className={`shrink-0 font-bold tabular-nums ${t.kind === 'income' ? 'text-leaf-ink' : ''}`}
+                >
                   {t.kind === 'income' ? '+' : ''}
                   {formatNaira(t.amountMinor)}
                 </span>
                 <button
                   type="button"
-                  aria-label={`Delete ${t.note || nameOf(t.categoryId)} ${formatNaira(t.amountMinor)}`}
-                  className="shrink-0 text-sm text-muted underline"
+                  aria-label={`Delete ${titleOf(t)} ${formatNaira(t.amountMinor)}`}
+                  className="grid size-11 shrink-0 place-items-center rounded-full text-xl text-muted hover:bg-tint-violet"
                   onClick={() => {
                     remove.mutate(t)
                     setUndoable(t)
                   }}
                 >
-                  Delete
+                  <span aria-hidden="true">×</span>
                 </button>
               </li>
             ))}

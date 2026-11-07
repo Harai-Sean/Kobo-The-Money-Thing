@@ -1,5 +1,6 @@
 import type { IsoDate } from '../../lib/dates/dates'
 import { sharePercentages } from '../../lib/money/money'
+import { categoryColor } from './colors'
 import type { Category, Transaction } from './types'
 
 export interface CategoryShare {
@@ -9,8 +10,6 @@ export interface CategoryShare {
   total: number
   percent: number
 }
-
-const UNCATEGORISED_COLOR = '#8a948e'
 export interface MonthTotals {
   income: number
   expense: number
@@ -41,7 +40,7 @@ export function summarize(
         categoryId,
         total,
         name: category?.name ?? 'Uncategorised',
-        color: category?.color ?? UNCATEGORISED_COLOR,
+        color: categoryColor(categories, categoryId),
       }
     })
     .sort((a, b) => b.total - a.total)

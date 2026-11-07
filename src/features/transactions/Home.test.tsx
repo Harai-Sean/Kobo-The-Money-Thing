@@ -59,6 +59,29 @@ describe('Home: list', () => {
     expect(within(list).getByText('+₦500,000')).toBeInTheDocument()
   })
 
+  it('gives an entry without a note a readable title instead of repeating the category', async () => {
+    openHome([
+      {
+        id: 'n1',
+        amountMinor: 100_000,
+        kind: 'income',
+        categoryId: null,
+        note: '',
+        occurredOn: '2026-10-14',
+      },
+      {
+        id: 'n2',
+        amountMinor: 50_000,
+        kind: 'expense',
+        categoryId: null,
+        note: '',
+        occurredOn: '2026-10-14',
+      },
+    ])
+    expect(await screen.findByRole('button', { name: 'Delete Income ₦1,000' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Delete Expense ₦500' })).toBeInTheDocument()
+  })
+
   it('shows a friendly empty state', async () => {
     openHome([])
     expect(await screen.findByText(/Nothing here yet/)).toBeInTheDocument()

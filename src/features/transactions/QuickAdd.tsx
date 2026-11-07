@@ -89,36 +89,46 @@ export function QuickAdd() {
     setDateOverride(undefined)
   }
 
+  const chip = 'animate-pop rounded-full px-4 py-1.5'
   return (
-    <section aria-label="Quick add" className="border-t-4 border-deep bg-card p-4">
-      <form onSubmit={handleSubmit} className="space-y-3">
+    <section aria-label="Quick add">
+      <form onSubmit={handleSubmit}>
         <div className="flex gap-2">
           <input
             ref={inputRef}
             aria-label="Quick add"
-            placeholder='Try "bolt 2.5k yesterday" or "+salary 500k"'
+            placeholder="coffee 1500 yesterday"
             autoComplete="off"
             value={text}
             onChange={(e) => setText(e.target.value)}
-            className="min-w-0 flex-1 rounded-sm border-2 border-ink/40 bg-surface px-3 py-3 font-display text-xl"
+            className="h-14 min-w-0 flex-1 rounded-full border-2 border-ink bg-card px-5 font-display text-lg font-bold"
           />
-          <Button type="submit" disabled={!canSave}>
-            Add
+          <Button
+            type="submit"
+            size="icon"
+            aria-label="Add"
+            disabled={!canSave}
+            className="size-14 text-3xl leading-none"
+          >
+            +
           </Button>
         </div>
 
         {text.trim() !== '' && (
-          <ul aria-label="Preview" className="flex flex-wrap items-center gap-2 text-sm">
-            <li className="animate-pop rounded-full bg-ink/5 px-3 py-1">
-              Amount:{' '}
+          <ul
+            aria-label="Preview"
+            className="mt-3 flex flex-wrap items-center gap-2 text-sm font-semibold"
+          >
+            <li className={`${chip} bg-sun`}>
+              <span className="sr-only">Amount: </span>
               <strong>
-                {parsed.amountMinor === null ? 'none yet' : formatNaira(parsed.amountMinor)}
+                {parsed.amountMinor === null ? 'no amount yet' : formatNaira(parsed.amountMinor)}
               </strong>
             </li>
-            <li className="animate-pop rounded-full bg-ink/5 px-3 py-1">
+            <li className={`${chip} ${parsed.kind === 'income' ? 'bg-tint-leaf' : 'bg-track'}`}>
               {parsed.kind === 'income' ? 'Income' : 'Expense'}
             </li>
-            <li className="animate-pop rounded-full bg-ink/5 px-3 py-1">
+            <li className={`${chip} bg-tint-blue`}>
               <label>
                 Category{' '}
                 <select
@@ -137,7 +147,7 @@ export function QuickAdd() {
                 </select>
               </label>
             </li>
-            <li className="animate-pop rounded-full bg-ink/5 px-3 py-1">
+            <li className={`${chip} bg-tint-violet`}>
               <label>
                 Date{' '}
                 <input
@@ -147,26 +157,26 @@ export function QuickAdd() {
                   className="bg-transparent"
                 />
               </label>{' '}
-              <span className="text-muted">({formatDayHeading(date, today)})</span>
+              <span className="font-normal text-muted">({formatDayHeading(date, today)})</span>
             </li>
           </ul>
         )}
 
-        <div aria-live="polite" className="min-h-5 text-sm">
+        <div aria-live="polite" className="text-sm">
           {text.trim() !== '' &&
             parsed.warnings.map((w) => (
-              <p key={w.code} className="text-danger">
+              <p key={w.code} className="mt-2 text-danger">
                 {w.message}
               </p>
             ))}
           {text.trim() === '' && savedMessage && (
-            <p role="status" className="text-brand">
+            <p role="status" className="mt-2 font-semibold text-leaf-ink">
               {savedMessage}
             </p>
           )}
         </div>
         {add.isError && (
-          <p role="alert" className="text-sm text-danger">
+          <p role="alert" className="mt-2 text-sm text-danger">
             Your last entry could not be saved. Please add it again.
           </p>
         )}

@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Navigate, useLocation } from 'react-router'
 import { Button } from '../../components/ui/Button'
-import { Logo } from '../../components/ui/Logo'
+import { LoginShapes } from '../../components/ui/Shapes'
 import { TextField } from '../../components/ui/TextField'
 import { useAuth } from './useAuth'
 
@@ -32,19 +32,19 @@ export function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen md:grid md:grid-cols-2">
-      <div className="on-dark bg-deep p-8 text-white md:p-14">
-        <Logo className="size-10" />
-        <p className="mt-10 font-display text-4xl font-bold leading-tight md:text-6xl">
-          Type it like you’d <span className="text-lime">say it.</span>
-        </p>
-        <p className="mt-4 max-w-sm text-white/75">
-          coffee 1500 · bolt 2.5k yesterday · +salary 500k
-        </p>
+    <main className="mx-auto min-h-screen max-w-5xl md:grid md:grid-cols-2 md:items-center md:gap-10">
+      <div>
+        <LoginShapes className="block h-auto w-full" />
+        <div className="px-6 md:px-0">
+          <p className="font-display text-5xl font-extrabold leading-none tracking-tight md:text-6xl">
+            Type it like you’d say it.
+          </p>
+          <p className="mt-3 text-muted">coffee 1500 · bolt 2.5k yesterday · +salary 500k</p>
+        </div>
       </div>
-      <div className="p-8 md:p-14">
-        <h1 className="font-display text-3xl font-bold">Sign in to Kobo</h1>
-        <form onSubmit={handleSubmit} className="mt-6 max-w-sm space-y-4">
+      <div className="px-6 pb-10 pt-8 md:px-0">
+        <h1 className="font-display text-2xl font-extrabold">Sign in to Kobo</h1>
+        <form onSubmit={handleSubmit} className="mt-4 max-w-sm space-y-4">
           <TextField
             label="Email"
             type="email"
