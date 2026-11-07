@@ -7,25 +7,26 @@ export function AppLayout() {
   const { signOut } = useAuth()
   return (
     <>
-      <header className="on-dark bg-deep text-white">
-        <div className="mx-auto flex max-w-2xl items-center justify-between p-4">
-          <Link to="/" className="flex items-center gap-2 font-display text-2xl font-bold">
-            <Logo className="size-7" />
-            Kobo
+      <header className="mx-auto flex max-w-2xl items-center justify-between px-5 py-5">
+        <Link
+          to="/"
+          className="flex items-center gap-2 font-display text-3xl font-extrabold tracking-tight"
+        >
+          <Logo className="size-8" />
+          Kobo
+        </Link>
+        <nav aria-label="Main" className="flex items-center gap-4 text-sm font-semibold">
+          <Link to="/settings" className="underline underline-offset-4">
+            Settings
           </Link>
-          <nav aria-label="Main" className="flex items-center gap-5 text-sm">
-            <Link to="/settings" className="underline decoration-lime underline-offset-4">
-              Settings
-            </Link>
-            <button
-              type="button"
-              onClick={() => void signOut()}
-              className="underline decoration-lime underline-offset-4"
-            >
-              Sign out
-            </button>
-          </nav>
-        </div>
+          <button
+            type="button"
+            onClick={() => void signOut()}
+            className="underline underline-offset-4"
+          >
+            Sign out
+          </button>
+        </nav>
       </header>
       <Outlet />
     </>

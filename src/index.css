@@ -4,31 +4,39 @@
 
 /*
   Design tokens. Tailwind v4 turns each --color-* / --font-* / --animate-* variable in @theme
-  into utility classes (bg-deep, text-lime, font-display, animate-rise, ...). Components use
+  into utility classes (bg-brand, text-muted, font-display, animate-rise, ...). Components use
   these names, never raw hex values, so restyling means editing this one block.
 
-  Palette: "deep" is a banknote-green used for the header and the month panel, "lime" is the
-  one bright accent (always on deep, never as text on white: not enough contrast), "brand" is
-  the readable green for buttons and links.
+  Palette: a light page, near-black ink, and four bright shapes colours (cobalt "brand", sun,
+  violet, leaf). The tints are soft backgrounds for chips; ink text on them passes 4.5:1.
 */
 @theme {
   --font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
   --font-sans: 'Instrument Sans Variable', system-ui, sans-serif;
 
-  --color-surface: #f6f7f4;
+  --color-surface: #f4f4f1;
   --color-card: #ffffff;
-  --color-ink: #0e1a14;
-  --color-muted: #52605a;
-  --color-brand: #0b5d3b;
-  --color-deep: #0a2f21;
-  --color-lime: #c6f25a;
+  --color-ink: #14141a;
+  --color-muted: #5b5b66;
+  --color-brand: #2d4bff;
+  --color-sun: #ffc933;
+  --color-violet: #8b5cf6;
+  --color-leaf: #1aa364;
+  --color-leaf-ink: #0b7a43;
   --color-danger: #b3261e;
+  --color-tint-blue: #dde3ff;
+  --color-tint-violet: #e9e0ff;
+  --color-tint-leaf: #ddf5e8;
+  --color-track: #e6e6e0;
+  --color-line: #b8b8b0;
 
-  /* Motion: each one is a short entrance. The reduced-motion rule below switches them all off. */
+  /* Motion: short entrances, plus a slow drift for decorative shapes. The reduced-motion rule
+     below switches all of it off. */
   --animate-rise: rise 0.4s ease-out both;
   --animate-pop: pop 0.25s ease-out both;
   --animate-grow: grow 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
   --animate-sweep: sweep 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-float: float 7s ease-in-out infinite alternate;
 
   @keyframes rise {
     from {
@@ -52,6 +60,11 @@
       stroke-dasharray: 0 100;
     } /* donut slices draw themselves in */
   }
+  @keyframes float {
+    to {
+      transform: translateY(-7px) rotate(4deg);
+    }
+  }
 }
 
 body {
@@ -63,10 +76,6 @@ body {
 :focus-visible {
   outline: 3px solid var(--color-brand);
   outline-offset: 2px;
-}
-/* On dark panels the green ring would vanish, so switch to lime there. */
-.on-dark :focus-visible {
-  outline-color: var(--color-lime);
 }
 
 /* Respect "reduce motion" from the OS. Every animation above inherits this. */
