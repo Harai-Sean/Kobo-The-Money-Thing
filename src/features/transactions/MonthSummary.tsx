@@ -1,9 +1,18 @@
 import { CountUp } from '../../components/CountUp'
+import { HeroShapes } from '../../components/ui/Shapes'
 import { addMonths, formatMonth, type MonthKey } from '../../lib/dates/dates'
 import { formatNaira } from '../../lib/money/money'
 import { Donut } from './Donut'
 import { useCategories, useMonthTransactions } from './hooks'
 import { changeVersusLast, summarize } from './summary'
+
+// Long amounts get a smaller size so they never run off a phone screen.
+function amountSize(text: string): string {
+  if (text.length <= 7) return 'text-7xl'
+  if (text.length <= 9) return 'text-6xl'
+  if (text.length <= 11) return 'text-5xl'
+  return 'text-4xl'
+}
 
 export function MonthSummary({ month }: { month: MonthKey }) {
   const previousMonth = addMonths(month, -1)
@@ -31,45 +40,51 @@ export function MonthSummary({ month }: { month: MonthKey }) {
 
   return (
     <section aria-label="Month summary" className="space-y-6">
-      <div className="on-dark rounded-sm bg-deep p-5 text-white">
-        <dl className="grid grid-cols-2 gap-x-4 gap-y-5">
-          <div className="col-span-2">
-            <dt className="text-sm text-white/75">Money out</dt>
-            <dd className="font-display text-5xl font-bold tabular-nums text-lime">
-              <CountUp value={totals.expense} format={formatNaira} />
-            </dd>
-          </div>
-          <div>
-            <dt className="text-sm text-white/75">Money in</dt>
-            <dd className="text-xl font-semibold tabular-nums">
+      <div className="relative flex min-h-72 flex-col overflow-hidden rounded-[2rem] border-2 border-ink bg-card p-6">
+        <HeroShapes className="pointer-events-none absolute -right-5 -top-7 size-48" />
+        <p className="relative text-sm font-semibold text-muted">Money out</p>
+        <p
+          className={`relative mt-auto font-display font-extrabold leading-none tracking-tighter tabular-nums ${amountSize(formatNaira(totals.expense))}`}
+        >
+          <CountUp value={totals.expense} format={formatNaira} />
+        </p>
+        <dl className="relative mt-4 flex flex-wrap gap-2 text-sm font-semibold">
+          <div className="rounded-full bg-tint-leaf px-4 py-2">
+            <dt className="inline">
+              <span className="sr-only">Money in</span>
+              <span aria-hidden="true">In </span>
+            </dt>
+            <dd className="inline tabular-nums">
               <CountUp value={totals.income} format={formatNaira} />
             </dd>
           </div>
-          <div>
-            <dt className="text-sm text-white/75">Net</dt>
-            <dd className="text-xl font-semibold tabular-nums">
+          <div className="rounded-full bg-tint-blue px-4 py-2">
+            <dt className="inline">Net </dt>
+            <dd className="inline tabular-nums">
               <CountUp value={totals.net} format={formatNaira} />
             </dd>
           </div>
         </dl>
-        {/* Neutral on purpose: spending going up is information, not a victory. */}
-        <p className="mt-5 border-t border-white/20 pt-3 text-sm text-white/75">
-          {change === null
-            ? `No spending in ${formatMonth(previousMonth)} to compare with.`
-            : `Spending is ${change > 0 ? 'up' : change < 0 ? 'down' : 'unchanged'}${change === 0 ? '' : ` ${Math.abs(change)}%`} compared with ${formatMonth(previousMonth)}.`}
-        </p>
       </div>
+
+      {/* Neutral on purpose: spending going up is information, not a victory. */}
+      <p className="flex items-center gap-3 text-sm text-muted">
+        <span aria-hidden="true" className="size-3 shrink-0 rounded-full bg-violet" />
+        {change === null
+          ? `No spending in ${formatMonth(previousMonth)} to compare with.`
+          : `Spending is ${change > 0 ? 'up' : change < 0 ? 'down' : 'unchanged'}${change === 0 ? '' : ` ${Math.abs(change)}%`} compared with ${formatMonth(previousMonth)}.`}
+      </p>
 
       {totals.categories.length > 0 && (
         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
           <Donut slices={totals.categories} />
           <div className="w-full">
-            <h3 className="font-display text-xl font-bold">Where it went</h3>
-            <ul className="mt-3 space-y-3">
+            <h3 className="font-display text-2xl font-extrabold tracking-tight">Where it went</h3>
+            <ul className="mt-3 space-y-4">
               {totals.categories.map((c) => (
                 <li key={c.categoryId ?? 'none'}>
                   {/* The text carries the meaning; colour and bar are extra, never the only signal. */}
-                  <div className="flex items-center justify-between gap-3 text-sm">
+                  <div className="flex items-center justify-between gap-3 text-sm font-semibold">
                     <span className="flex items-center gap-2">
                       <span
                         aria-hidden="true"
@@ -82,9 +97,9 @@ export function MonthSummary({ month }: { month: MonthKey }) {
                       {c.percent}% · {formatNaira(c.total)}
                     </span>
                   </div>
-                  <div aria-hidden="true" className="mt-1 h-1.5 bg-ink/10">
+                  <div aria-hidden="true" className="mt-1.5 h-2.5 rounded-full bg-track">
                     <div
-                      className="h-1.5 origin-left animate-grow"
+                      className="h-2.5 origin-left animate-grow rounded-full"
                       style={{ width: `${c.percent}%`, background: c.color }}
                     />
                   </div>

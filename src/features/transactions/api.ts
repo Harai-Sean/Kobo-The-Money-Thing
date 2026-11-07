@@ -47,7 +47,9 @@ export function createSupabaseTransactionsApi(client: SupabaseClient): Transacti
         .from('categories')
         .select('id, name, kind, color')
         .is('archived_at', null)
+        .order('kind') // expense before income
         .order('sort_order')
+        .order('name') // fixed tie-breakers: the list must come back in the same order every time, because colours depend on position
       check(error)
       return z.array(categoryRow).parse(data)
     },

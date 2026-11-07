@@ -55,6 +55,14 @@ describe('summarize', () => {
     expect(result.categories.map((c) => c.name)).toEqual(['Uncategorised', 'Uncategorised'])
   })
 
+  it('colours each category from the shared palette and uncategorised grey', () => {
+    const result = summarize(
+      [tx({ amountMinor: 300, categoryId: 'eating' }), tx({ amountMinor: 200, categoryId: null })],
+      categories,
+    )
+    expect(result.categories.map((c) => c.color)).toEqual(['#2D4BFF', '#8A948E'])
+  })
+
   it('handles an empty month', () => {
     expect(summarize([], categories)).toEqual({ income: 0, expense: 0, net: 0, categories: [] })
   })
