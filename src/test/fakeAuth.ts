@@ -29,6 +29,23 @@ export function createFakeAuth(initial: AuthSession | null = null) {
       emit('SIGNED_IN', { user: { id: 'user-1', email } })
       return { error: null }
     }),
+    // Default: "Confirm email" is off, so signing up signs the person in at once.
+    signUp: vi.fn(
+      async ({
+        email,
+      }: {
+        email: string
+        password: string
+        options?: { emailRedirectTo?: string }
+      }): Promise<{
+        data: { session: AuthSession | null }
+        error: { message: string } | null
+      }> => {
+        const created = { user: { id: 'user-2', email } }
+        emit('SIGNED_IN', created)
+        return { data: { session: created }, error: null }
+      },
+    ),
     signOut: vi.fn(async () => {
       emit('SIGNED_OUT', null)
       return { error: null }

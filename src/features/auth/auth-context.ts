@@ -16,6 +16,11 @@ export interface AuthApi {
     data: { subscription: { unsubscribe(): void } }
   }
   signInWithPassword(credentials: { email: string; password: string }): Promise<{ error: Failure }>
+  signUp(credentials: {
+    email: string
+    password: string
+    options?: { emailRedirectTo?: string }
+  }): Promise<{ data: { session: AuthSession | null }; error: Failure }>
   signOut(): Promise<{ error: Failure }>
   updateUser(attributes: { password: string }): Promise<{ error: Failure }>
 }
@@ -24,8 +29,12 @@ export interface AuthApi {
 export type AuthState =
   { status: 'loading' } | { status: 'signedOut' } | { status: 'signedIn'; session: AuthSession }
 
+/** What happened when someone tried to create an account. */
+export type SignUpResult = 'signed-in' | 'confirm-email' | 'rate-limited' | 'error'
+
 export interface AuthContextValue {
   state: AuthState
+  signUp: (email: string, password: string) => Promise<SignUpResult>
   signIn: (email: string, password: string) => Promise<boolean>
   signOut: () => Promise<void>
   changePassword: (newPassword: string) => Promise<boolean>

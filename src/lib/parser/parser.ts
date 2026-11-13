@@ -105,7 +105,24 @@ const MONTHS: Record<string, number> = {
 }
 
 // "1500", "1,500.5", "5k", "1.5m", "₦4500", "ngn2000", "n500" (prefix and suffix optional)
-const AMOUNT_TOKEN = /^(₦|ngn|n)?(\d[\d,]*(?:\.\d+)?)([km])?$/i
+const AMOUNT_TOKEN = /^(₦|ngn|n)?(\d[\d,]*(?:\.\d+)?)([khm])?$/i
+
+// Shorthand multipliers: 2h = 2 hundred (₦200), 5k = 5 thousand, 1.5m = 1.5 million.
+const SUFFIX_MULTIPLIER: Record<string, number> = { h: 100, k: 1_000, m: 1_000_000 }
+
+// Words that mean money is coming IN. The first group is removed from the note (they are just a
+// marker, like "+"); the second group is kept in the note because it says something useful.
+const INCOME_MARKERS = new Set(['income', 'add', 'added'])
+const INCOME_HINTS = new Set([
+  'received',
+  'credit',
+  'credited',
+  'deposit',
+  'deposited',
+  'earned',
+  'refund',
+  'refunded',
+])
 const SLASH_DATE = /^(\d{1,2})\/(\d{1,2})(?:\/(\d{4}|\d{2}))?$/
 const DAY = /^\d{1,2}$/
 
@@ -125,7 +142,7 @@ function readAmount(token: string): { kobo: number | null; explicit: boolean } |
   const baseKobo = nairaToKobo(base)
   if (baseKobo === null) return { kobo: null, explicit }
   if (!suffix) return { kobo: baseKobo, explicit }
-  const kobo = baseKobo * (suffix.toLowerCase() === 'k' ? 1_000 : 1_000_000)
+  const kobo = baseKobo * (SUFFIX_MULTIPLIER[suffix.toLowerCase()] ?? 1)
   return { kobo: kobo <= MAX_KOBO ? kobo : null, explicit }
 }
 
@@ -137,15 +154,22 @@ export function parse(text: string, ctx: ParseContext): ParseResult {
   const used = words.map(() => false)
   let kind: TxnKind = 'expense'
 
-  // 1. Kind: "+salary" or "+500k" or the word "income" means income.
+  // 1. Kind: "+", or words like "income" and "add", mean money coming IN.
+  let kindIsExplicit = false
   words.forEach((word, i) => {
+    const lower = word.toLowerCase()
     if (word.startsWith('+')) {
       kind = 'income'
+      kindIsExplicit = true
       words[i] = word.slice(1)
       if (words[i] === '') used[i] = true
-    } else if (word.toLowerCase() === 'income') {
+    } else if (INCOME_MARKERS.has(lower)) {
       kind = 'income'
+      kindIsExplicit = true
       used[i] = true
+    } else if (INCOME_HINTS.has(lower)) {
+      kind = 'income'
+      kindIsExplicit = true // the word stays in the note
     }
   })
 
@@ -254,9 +278,15 @@ export function parse(text: string, ctx: ParseContext): ParseResult {
   let categoryId: string | null = null
   let categorySource: ParseResult['categorySource'] = null
   let matchedWord: string | null = null
-  const accept = (id: string | undefined, source: 'rule' | 'name' | 'history', word: string) => {
+  const accept = (
+    id: string | undefined,
+    source: 'rule' | 'name' | 'history',
+    word: string,
+    anyKind = false,
+  ) => {
     const category = id ? byId.get(id) : undefined
-    if (category && category.kind === kind) {
+    if (category && (anyKind || category.kind === kind)) {
+      if (anyKind) kind = category.kind // "salary 500k" is income even without a plus sign
       categoryId = category.id
       categorySource = source
       matchedWord = word
@@ -266,7 +296,10 @@ export function parse(text: string, ctx: ParseContext): ParseResult {
   }
   // Priority: the user's saved rules, then category names, then past behaviour.
   const found =
-    noteWords.some((w) => accept(ctx.rules.find((r) => r.keyword === w)?.categoryId, 'rule', w)) ||
+    // A saved rule may decide the kind too, unless the person already said it ("+" or "add").
+    noteWords.some((w) =>
+      accept(ctx.rules.find((r) => r.keyword === w)?.categoryId, 'rule', w, !kindIsExplicit),
+    ) ||
     noteWords.some(
       (w) =>
         w.length >= 3 &&

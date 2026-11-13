@@ -4,11 +4,12 @@ A fast, private expense tracker. Type an expense the way you would say it (`bolt
 and see where your money went at the end of the month. Built for a small group of invited users,
 in naira.
 
-**Live app:** kobo-the-money-thing-fmj4-oztqor6ti-harai-seans-projects.vercel.app · **Status:** v0.1
+**Live app:** add your Vercel link here · **Status:** v0.1
 
-[Home](docs\screenshots\RMSC1.png)
-[Analytics](docs\screenshots\RMSC2.png)
-[Entries](docs\screenshots\RMSC3.png)
+<!-- Add two screenshots to docs/screenshots/ and uncomment:
+![Home](docs/screenshots/home.png)
+![Month summary](docs/screenshots/summary.png)
+-->
 
 ## What it does
 
@@ -17,7 +18,14 @@ in naira.
   Corrections teach the app: a fixed category becomes a saved rule.
 - **Month at a glance.** Money in and out, change against last month, and a donut with a legend
   showing each category's share. Percentages always add up to exactly 100.
-- **Entries by day** with daily totals, instant delete with undo, and a month switcher.
+- **Entries by day** with daily totals, delete with an "are you sure?" step plus undo, and a month switcher.
+- **A spreadsheet view.** See every entry as a table, search and filter it, sort any column, tick
+  rows to add them up (shift-click for a range), and copy the table straight into Excel or Sheets.
+- **Light and dark themes** that follow your device, with a one-tap override.
+- **Playful comments.** When spending on choices like eating out jumps, Kobo teases you a little.
+  Never about rent, groceries, health or family, and you can switch it off in Settings.
+- **Smart shorthand.** `2h` is ₦200, `5k` is ₦5,000, and `add 5000`, `received 5k` or
+  `salary 500k` are recognised as income.
 - **Your data stays yours.** Download everything as CSV from Settings. No bank linking, no ads.
 - **Accessible by design.** Keyboard shortcuts (`/` or `n` jumps to quick add), labelled controls,
   text alongside every colour, and all motion switches off for people who ask their device for less.
@@ -74,9 +82,12 @@ Requires Node 22 (see `.nvmrc`).
 
 ## Database setup
 
-1. Create a Supabase project and turn off public signups (Authentication, Sign In / Providers).
+1. Create a Supabase project. Under Authentication, Sign In / Providers, switch **Allow new users to
+   sign up** on, switch **Confirm email** off (the built-in email sender only reaches your own team and
+   is capped at about 2 emails an hour), and set the minimum password length to 10.
 2. Run `supabase/migrations/*.sql` in order in the SQL editor.
-3. Create users in Authentication, Users, with Auto Confirm ticked.
+3. People can now create their own accounts on the sign-up page. (You can still add users by hand in
+   Authentication, Users, with Auto Confirm ticked.)
 4. Verify security with `supabase/tests/rls_check.sql` (instructions inside the file).
 5. Optional: add repository secrets `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` so the
    keep-alive workflow can stop the free project pausing.
@@ -101,7 +112,7 @@ Short-lived branches and pull requests with
 
 ## Not in v0.1
 
-Editing entries, search and filter, budgets, offline writes, a dark theme and a PWA install.
+Editing entries, budgets, offline writes, bank connections, password reset by email, and a PWA install.
 
 ## Licence
 

@@ -2,14 +2,14 @@ import type { ButtonHTMLAttributes } from 'react'
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: 'primary' | 'secondary'
-  size?: 'md' | 'icon'
+  size?: 'md' | 'sm' | 'icon'
 }
 
 const variants = {
-  primary: 'border-ink bg-brand text-white hover:bg-ink',
-  secondary: 'border-ink bg-card text-ink hover:bg-sun',
+  primary: 'border-ink bg-brand text-white hover:opacity-90',
+  secondary: 'border-ink bg-card text-ink hover:bg-sun hover:text-ink-fixed',
 }
-const sizes = { md: 'px-5 py-3', icon: 'size-12 text-xl' }
+const sizes = { md: 'px-5 py-3', sm: 'px-3 py-1.5 text-sm', icon: 'size-12 text-xl' }
 
 // type defaults to "button" so a button inside a form never submits by accident.
 // A disabled button is plainly grey, so it never looks like a faded "live" one.

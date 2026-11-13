@@ -1,8 +1,11 @@
 import { z } from 'zod'
 
+/** The one password rule for the whole app (sign-up and change-password). */
+export const passwordSchema = z.string().min(10, 'Use at least 10 characters.')
+
 export const changePasswordSchema = z
   .object({
-    password: z.string().min(10, 'Use at least 10 characters.'),
+    password: passwordSchema,
     confirm: z.string(),
   })
   .refine((values) => values.password === values.confirm, {
