@@ -97,6 +97,49 @@ describe('amounts', () => {
   })
 })
 
+describe('shorthand amounts', () => {
+  it.each([
+    ['snacks 2h', 20_000], // 2 hundred
+    ['snacks 2H', 20_000],
+    ['snacks 1.5h', 15_000],
+    ['snacks 10h', 100_000],
+    ['snacks 2k', 200_000],
+  ])('%s -> %i kobo', (text, kobo) => {
+    expect(p(text).amountMinor).toBe(kobo)
+  })
+})
+
+describe('income words', () => {
+  it.each([
+    ['add 5000', 'income', ''],
+    ['added 5k tolu', 'income', 'tolu'],
+    ['ADD 2h', 'income', ''],
+    ['received 5k from tolu', 'income', 'received from tolu'], // hint words stay in the note
+    ['refund 3k', 'income', 'refund'],
+  ])('%s', (text, kind, note) => {
+    const r = p(text)
+    expect([r.kind, r.note]).toEqual([kind, note])
+    expect(r.amountMinor).not.toBeNull()
+  })
+
+  it('works out income from a saved rule even without a plus sign', () => {
+    expect(p('salary 500k')).toMatchObject({
+      kind: 'income',
+      categoryId: 'salary',
+      categorySource: 'rule',
+    })
+  })
+
+  it('does not let a rule override an explicit kind', () => {
+    expect(p('+rent 5k')).toMatchObject({ kind: 'income', categoryId: null })
+  })
+
+  it('leaves ordinary expenses alone', () => {
+    expect(p('bolt 2k').kind).toBe('expense')
+    expect(p('address 2k').kind).toBe('expense') // "add" inside a longer word is not a marker
+  })
+})
+
 describe('dates', () => {
   it.each([
     ['coffee 500 today', '2026-10-07'],
@@ -209,6 +252,9 @@ describe('robustness', () => {
 
   it('never throws and never returns a bad amount, whatever is typed', () => {
     const pieces = [
+      '2h',
+      'add',
+      'received',
       'coffee',
       '1500',
       '2.5k',
