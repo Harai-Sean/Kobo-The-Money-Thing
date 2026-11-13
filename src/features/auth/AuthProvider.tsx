@@ -5,6 +5,7 @@ import {
   type AuthContextValue,
   type AuthSession,
   type AuthState,
+  type SignUpResult,
 } from './auth-context'
 
 function toState(session: AuthSession | null): AuthState {
@@ -51,6 +52,24 @@ export function AuthProvider({ auth, children }: { auth: AuthApi; children: Reac
     [auth],
   )
 
+  const signUp = useCallback(
+    async (email: string, password: string): Promise<SignUpResult> => {
+      const { data, error } = await auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: window.location.origin },
+      })
+      if (error)
+        return /rate limit|too many|only request this once/i.test(error.message)
+          ? 'rate-limited'
+          : 'error'
+      // With "Confirm email" off, Supabase signs the new person in straight away (a session).
+      // With it on, there is no session until they click the link in their inbox.
+      return data.session ? 'signed-in' : 'confirm-email'
+    },
+    [auth],
+  )
+
   const signOut = useCallback(async () => {
     await auth.signOut() // supabase-js clears the stored session; the listener flips our state
   }, [auth])
@@ -64,8 +83,8 @@ export function AuthProvider({ auth, children }: { auth: AuthApi; children: Reac
   )
 
   const value = useMemo<AuthContextValue>(
-    () => ({ state, signIn, signOut, changePassword }),
-    [state, signIn, signOut, changePassword],
+    () => ({ state, signUp, signIn, signOut, changePassword }),
+    [state, signUp, signIn, signOut, changePassword],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

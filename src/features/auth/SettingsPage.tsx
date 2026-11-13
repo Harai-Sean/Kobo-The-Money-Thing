@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Button } from '../../components/ui/Button'
 import { transactionsToCsv } from '../../lib/csv/csv'
 import { todayIso } from '../../lib/dates/dates'
+import { readNudgesEnabled, saveNudgesEnabled } from '../../lib/preferences'
 import { downloadTextFile } from '../../lib/download'
 import { useTransactionsApi } from '../transactions/hooks'
 import { TextField } from '../../components/ui/TextField'
@@ -18,6 +19,7 @@ export function SettingsPage() {
   const [done, setDone] = useState(false)
   const [pending, setPending] = useState(false)
   const api = useTransactionsApi()
+  const [nudges, setNudges] = useState(readNudgesEnabled)
   const [exportState, setExportState] = useState<'idle' | 'working' | 'done' | 'failed'>('idle')
 
   async function handleExport() {
@@ -65,6 +67,20 @@ export function SettingsPage() {
       <h1 className="font-display text-3xl font-extrabold tracking-tight">Settings</h1>
       <p className="mt-2 text-muted">Signed in as {user.email}</p>
 
+      <h2 className="mt-8 font-display text-xl font-extrabold">Fun comments</h2>
+      <label className="mt-2 flex items-center gap-3 text-sm">
+        <input
+          type="checkbox"
+          checked={nudges}
+          onChange={(e) => {
+            setNudges(e.target.checked)
+            saveNudgesEnabled(e.target.checked)
+          }}
+          className="size-5 accent-brand"
+        />
+        Show playful comments when my spending jumps
+      </label>
+
       <h2 className="mt-8 font-display text-xl font-extrabold">Your data</h2>
       <p className="mt-1 text-sm text-muted">
         Download every entry as a spreadsheet file. It is made on your device and goes nowhere else.
@@ -78,7 +94,7 @@ export function SettingsPage() {
         {exportState === 'working' ? 'Preparing…' : 'Download my data (CSV)'}
       </Button>
       {exportState === 'done' && (
-        <p role="status" className="mt-2 text-sm font-medium text-brand">
+        <p role="status" className="mt-2 text-sm font-medium text-leaf-ink">
           Downloaded.
         </p>
       )}
@@ -113,7 +129,7 @@ export function SettingsPage() {
           </p>
         )}
         {done && (
-          <p role="status" className="text-sm font-medium text-brand">
+          <p role="status" className="text-sm font-medium text-leaf-ink">
             Password updated.
           </p>
         )}

@@ -94,9 +94,24 @@ describe('Home: list', () => {
     expect(await screen.findAllByText(/Could not load/)).not.toHaveLength(0)
   })
 
-  it('deletes an entry and lets you undo it', async () => {
+  it('asks before deleting, and Cancel keeps the entry', async () => {
     const { user, api } = openHome()
     await user.click(await screen.findByRole('button', { name: 'Delete lunch ₦4,500' }))
+
+    expect(screen.getByText('Delete this?')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Cancel' })).toHaveFocus() // the safe choice is focused first
+    expect(api.deleteTransaction).not.toHaveBeenCalled()
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(screen.queryByText('Delete this?')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Delete lunch ₦4,500' })).toBeInTheDocument()
+    expect(api.deleteTransaction).not.toHaveBeenCalled()
+  })
+
+  it('deletes after confirmation and lets you undo it', async () => {
+    const { user, api } = openHome()
+    await user.click(await screen.findByRole('button', { name: 'Delete lunch ₦4,500' }))
+    await user.click(screen.getByRole('button', { name: 'Yes, delete' }))
 
     expect(screen.queryByRole('button', { name: 'Delete lunch ₦4,500' })).not.toBeInTheDocument()
     expect(api.deleteTransaction).toHaveBeenCalledWith('t2')
@@ -112,6 +127,40 @@ describe('Home: list', () => {
     const list = screen.getByRole('region', { name: 'Transactions' })
     expect(await within(list).findByText('suya')).toBeInTheDocument()
     expect(within(list).getByText('Today')).toBeInTheDocument()
+  })
+})
+
+describe('Home: playful comments', () => {
+  const jumpy: Transaction[] = [
+    ...seed,
+    {
+      id: 't5',
+      amountMinor: 200_000,
+      kind: 'expense',
+      categoryId: 'cat-eating',
+      note: 'dinner',
+      occurredOn: '2026-09-18',
+    },
+  ]
+
+  it('teases when eating out jumps compared with last month, and can be switched off', async () => {
+    localStorage.clear()
+    openHome(jumpy)
+    const summary = await screen.findByRole('region', { name: 'Month summary' })
+    expect(
+      await within(summary).findByText(/eat out less yo|kitchen misses you|looking questionable/),
+    ).toBeInTheDocument()
+  })
+
+  it('stays quiet when the person turned comments off', async () => {
+    localStorage.setItem('kobo-nudges', 'off')
+    openHome(jumpy)
+    const summary = await screen.findByRole('region', { name: 'Month summary' })
+    await within(summary).findByText(/compared with September 2026/)
+    expect(
+      within(summary).queryByText(/eat out less yo|kitchen misses you|looking questionable/),
+    ).not.toBeInTheDocument()
+    localStorage.clear()
   })
 })
 

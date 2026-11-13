@@ -18,6 +18,8 @@ export function TransactionList({ month }: { month: MonthKey }) {
   const remove = useDeleteTransaction()
   const restore = useRestoreTransaction()
   const [undoable, setUndoable] = useState<Transaction | null>(null)
+  // The entry waiting for "are you sure?". Only one at a time.
+  const [confirmingId, setConfirmingId] = useState<string | null>(null)
 
   // The "Undo" offer disappears by itself after 8 seconds.
   useEffect(() => {
@@ -89,7 +91,7 @@ export function TransactionList({ month }: { month: MonthKey }) {
             {group.items.map((t, index) => (
               <li
                 key={t.id}
-                className="flex animate-rise items-center gap-3 py-1.5"
+                className="flex animate-rise flex-wrap items-center gap-x-3 gap-y-1 py-1.5"
                 style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
               >
                 <span
@@ -112,17 +114,43 @@ export function TransactionList({ month }: { month: MonthKey }) {
                   {t.kind === 'income' ? '+' : ''}
                   {formatNaira(t.amountMinor)}
                 </span>
-                <button
-                  type="button"
-                  aria-label={`Delete ${titleOf(t)} ${formatNaira(t.amountMinor)}`}
-                  className="grid size-11 shrink-0 place-items-center rounded-full text-xl text-muted hover:bg-tint-violet"
-                  onClick={() => {
-                    remove.mutate(t)
-                    setUndoable(t)
-                  }}
-                >
-                  <span aria-hidden="true">×</span>
-                </button>
+                {confirmingId === t.id ? (
+                  <span
+                    role="group"
+                    aria-label={`Confirm deleting ${titleOf(t)}`}
+                    className="flex shrink-0 items-center gap-2 text-sm"
+                  >
+                    <span className="font-semibold">Delete this?</span>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        remove.mutate(t)
+                        setUndoable(t)
+                        setConfirmingId(null)
+                      }}
+                    >
+                      Yes, delete
+                    </Button>
+                    {/* Focus starts on the safe choice, so a stray Enter never deletes. */}
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      autoFocus
+                      onClick={() => setConfirmingId(null)}
+                    >
+                      Cancel
+                    </Button>
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    aria-label={`Delete ${titleOf(t)} ${formatNaira(t.amountMinor)}`}
+                    className="grid size-11 shrink-0 place-items-center rounded-full text-xl text-muted hover:bg-tint-violet"
+                    onClick={() => setConfirmingId(t.id)}
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                )}
               </li>
             ))}
           </ul>

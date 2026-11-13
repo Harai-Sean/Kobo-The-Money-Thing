@@ -1,12 +1,17 @@
 import type { Category, Transaction } from '../../features/transactions/types'
 
 /**
- * Makes one value safe to put in a CSV file.
+ * Makes one value safe to open in a spreadsheet.
  * SECURITY: a spreadsheet runs any cell that starts with = + - @ as a formula (for example a
  * note typed as =HYPERLINK(...)). We prefix such cells with an apostrophe so they stay plain text.
  */
+export function spreadsheetSafe(value: string): string {
+  return /^[=+\-@\t\r]/.test(value) ? `'${value}` : value
+}
+
+/** Makes one value safe to put in a CSV file: formula-safe, and quoted when it needs to be. */
 export function csvCell(value: string): string {
-  const safe = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value
+  const safe = spreadsheetSafe(value)
   return /[",\r\n]/.test(safe) ? `"${safe.replaceAll('"', '""')}"` : safe
 }
 

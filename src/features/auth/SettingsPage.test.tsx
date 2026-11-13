@@ -75,4 +75,14 @@ describe('SettingsPage', () => {
     expect(screen.getByLabelText('New password')).toHaveAttribute('type', 'text')
     expect(screen.getByLabelText('Confirm new password')).toHaveAttribute('type', 'password')
   })
+
+  it('lets you switch the playful comments off, and remembers it', async () => {
+    const { user } = await openSettings()
+    const box = screen.getByRole('checkbox', { name: /playful comments/ })
+    expect(box).toBeChecked()
+    await user.click(box)
+    expect(box).not.toBeChecked()
+    expect(localStorage.getItem('kobo-nudges')).toBe('off')
+    localStorage.clear()
+  })
 })

@@ -4,6 +4,8 @@ import { addMonths, formatMonth, type MonthKey } from '../../lib/dates/dates'
 import { formatNaira } from '../../lib/money/money'
 import { Donut } from './Donut'
 import { useCategories, useMonthTransactions } from './hooks'
+import { readNudgesEnabled } from '../../lib/preferences'
+import { pickNudge } from './nudges'
 import { changeVersusLast, summarize } from './summary'
 
 // Long amounts get a smaller size so they never run off a phone screen.
@@ -34,6 +36,8 @@ export function MonthSummary({ month }: { month: MonthKey }) {
     )
 
   const totals = summarize(current.data, categories)
+  const previousTotals = previous.data ? summarize(previous.data, categories) : null
+  const nudge = readNudgesEnabled() ? pickNudge(totals, previousTotals, month) : null
   const change = previous.data
     ? changeVersusLast(totals.expense, summarize(previous.data, categories).expense)
     : null
@@ -74,6 +78,15 @@ export function MonthSummary({ month }: { month: MonthKey }) {
           ? `No spending in ${formatMonth(previousMonth)} to compare with.`
           : `Spending is ${change > 0 ? 'up' : change < 0 ? 'down' : 'unchanged'}${change === 0 ? '' : ` ${Math.abs(change)}%`} compared with ${formatMonth(previousMonth)}.`}
       </p>
+
+      {nudge && (
+        <p className="flex items-center gap-3 rounded-full bg-tint-violet px-5 py-3 text-sm font-semibold">
+          <span aria-hidden="true" className="text-xl">
+            {nudge.emoji}
+          </span>
+          {nudge.text}
+        </p>
+      )}
 
       {totals.categories.length > 0 && (
         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">

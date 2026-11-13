@@ -119,7 +119,7 @@ export function QuickAdd() {
             aria-label="Preview"
             className="mt-3 flex flex-wrap items-center gap-2 text-sm font-semibold"
           >
-            <li className={`${chip} bg-sun`}>
+            <li className={`${chip} bg-sun text-ink-fixed`}>
               <span className="sr-only">Amount: </span>
               <strong>
                 {parsed.amountMinor === null ? 'no amount yet' : formatNaira(parsed.amountMinor)}
