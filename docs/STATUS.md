@@ -4,6 +4,10 @@ _Update this file at the end of every work session. Paste it into a new chat to 
 
 ## Done
 
+- Parser: `h` shorthand (2h = ₦200), income words (add, received, ...), income inferred from rules
+- Delete confirmation; dark theme with toggle (no flash, contrast checked); playful comments with an
+  off switch; spreadsheet page (search, filter, sort, tick-to-sum, copy as TSV)
+
 - Visual identity v2: cobalt, sun, violet and leaf on a light page; pill shapes, drifting geometric
   shapes, ledger-style list, donut with stable category colours, show/hide password, motion that
   respects reduced-motion. Contrast for every text pair checked (lowest 4.88:1)
@@ -21,8 +25,11 @@ _Update this file at the end of every work session. Paste it into a new chat to 
 - Transactions: data layer (TanStack Query, optimistic add/delete/undo), QuickAdd with live preview
   and category correction that saves rules, grouped list, month switcher, month summary
 
+- Self-service sign-up page (email and password). Needs Supabase: signups on, Confirm email off
+
 ## Next
 
+0. Custom SMTP (for email confirmation and password reset), then a forgot-password flow
 1. Edit entries, search and filter
 2. Dark theme, PWA install, offline (see ADR-001)
 3. Wire parser `history`; budgets
